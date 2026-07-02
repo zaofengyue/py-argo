@@ -1,1 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Midnight Notes Blog</title>
 
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #171a21;
+      --text: #e6e6e6;
+      --muted: #a0a0a0;
+      --accent: #7c5cff;
+      --border: #2a2f3a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Georgia", "Times New Roman", serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1a1f2e, var(--bg));
+      color: var(--text);
+      line-height: 1.7;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 42px;
+      letter-spacing: 2px;
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .post {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      transition: transform 0.2s ease;
+    }
+
+    .post:hover {
+      transform: translateY(-4px);
+    }
+
+    .post h2 {
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 15px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      margin-right: 5px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header>
+      <h1>Midnight Notes</h1>
+      <p>A quiet place for thoughts, code, and late-night ideas.</p>
+    </header>
+
+    <div class="post">
+      <h2>Why Simplicity Wins in Web Design</h2>
+      <div class="meta">July 2, 2026 · 5 min read</div>
+      <span class="tag">Design</span>
+      <span class="tag">Minimalism</span>
+      <p>
+        In a world overloaded with frameworks and animations, simplicity stands out.
+        Clean layouts reduce cognitive load and help users focus on what matters:
+        content. A good interface disappears and lets ideas speak.
+      </p>
+    </div>
+
+    <div class="post">
+      <h2>Learning to Code Without Burning Out</h2>
+      <div class="meta">June 28, 2026 · 7 min read</div>
+      <span class="tag">Programming</span>
+      <span class="tag">Productivity</span>
+      <p>
+        Consistency beats intensity. You don't need 10-hour coding marathons.
+        Instead, build small daily habits, ship tiny projects, and keep momentum.
+        Progress is rarely dramatic—but it compounds.
+      </p>
+    </div>
+
+    <div class="post">
+      <h2>The Beauty of Static Websites</h2>
+      <div class="meta">June 20, 2026 · 4 min read</div>
+      <span class="tag">Web</span>
+      <span class="tag">Performance</span>
+      <p>
+        Static sites are fast, secure, and easy to deploy. No servers, no databases,
+        just pure HTML, CSS, and maybe a bit of JavaScript. Sometimes less really is more.
+      </p>
+    </div>
+
+    <footer>
+      <p>© 2026 Midnight Notes · Built with pure HTML</p>
+      <p><a href="#">RSS</a> · <a href="#">GitHub</a> · <a href="#">Contact</a></p>
+    </footer>
+
+  </div>
+</body>
+</html>
