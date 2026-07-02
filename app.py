@@ -78,12 +78,11 @@ CLOUDFLARED_ARCH_MAP = {
 
 TRYCLOUDFLARE_RE = re.compile(r"https://([a-z0-9-]+\.trycloudflare\.com)")
 
+# 内置兜底页面：当同目录下没有 index.html 时使用（现在是 Hello World）
 FALLBACK_STATUS_PAGE = """<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>py-argo</title></head>
-<body style="font-family:sans-serif;max-width:600px;margin:60px auto;line-height:1.6">
-<h1>py-argo</h1>
-<p>This host is running a personal xray + Cloudflare Argo tunnel proxy service.</p>
-<p>Subscription endpoint: <code>{sub_path}</code></p>
+<html><head><meta charset="utf-8"><title>Hello World</title></head>
+<body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">
+<h1>Hello, World!</h1>
 </body></html>
 """
 
@@ -531,7 +530,7 @@ def _load_index_html(sub_path: str) -> str:
             return INDEX_HTML_FILE.read_text(encoding="utf-8")
         except Exception as e:
             log.warning("failed to read index.html: %s", e)
-    return FALLBACK_STATUS_PAGE.format(sub_path=sub_path)
+    return FALLBACK_STATUS_PAGE
 
 
 def run_public_http_server(settings: Settings, sub_content_holder: dict):
