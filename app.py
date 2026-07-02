@@ -1,11 +1,4 @@
-"""
-app.py — nodex-argo-py 单文件版
-
-功能：基于 xray + Cloudflare Argo 隧道的多协议代理服务（VMess/VLESS/Trojan），
-支持临时隧道和固定隧道，提供订阅接口。
-
-部署时只需上传这一个文件即可（配合 requirements 无第三方依赖）。
-"""
+"""app.py — nodex-argo-py 单文件版"""
 import base64
 import json
 import logging
@@ -27,6 +20,18 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+# ============================================================================
+# 配置区（可在这里直接填写，优先级高于环境变量；留空则读环境变量，都没有则自动生成/使用默认值）
+# ============================================================================
+CONF_UUID = ""          # VMess/VLESS/Trojan 统一 ID
+CONF_PORT = ""          # 对外监听端口
+CONF_ARGO_PORT = ""     # Argo 内部转发端口（固定隧道默认 8001）
+CONF_NAME = ""          # 节点名称前缀
+CONF_SUB = ""           # 订阅路径，默认 sub
+CONF_ARGO_DOMAIN = ""   # 固定隧道域名（留空用临时隧道）
+CONF_ARGO_AUTH = ""     # 固定隧道 Token（留空用临时隧道）
+# ============================================================================
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s %(message)s")
 log = logging.getLogger("nodex")
 
@@ -36,7 +41,6 @@ log = logging.getLogger("nodex")
 HOME = Path(os.environ.get("HOME", "/tmp"))
 APP_DIR = HOME / "nodex-argo-py"
 UUID_FILE = APP_DIR / "uuid.txt"
-TROJAN_FILE = APP_DIR / "trojan.txt"
 XRAY_CONFIG_FILE = APP_DIR / "xray-config.json"
 XRAY_DIR = APP_DIR / "xray"
 XRAY_BIN_PATH = XRAY_DIR / "xray"
@@ -81,7 +85,7 @@ STATUS_PAGE = """<!DOCTYPE html>
 
 
 # ---------------------------------------------------------------------------
-# 配置
+# 配置加载
 # ---------------------------------------------------------------------------
 def get_free_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -101,7 +105,6 @@ def _read_or_create(path: Path, generator) -> str:
 @dataclass
 class Settings:
     uuid: str
-    trojan_pass: str
     inbound_port: int
     argo_port: int
     sub_path: str
@@ -118,23 +121,18 @@ class Settings:
 def load_settings() -> Settings:
     APP_DIR.mkdir(parents=True, exist_ok=True)
 
-    env_uuid = os.environ.get("UUID", "")
+    env_uuid = CONF_UUID or os.environ.get("UUID", "")
     node_uuid = env_uuid or _read_or_create(UUID_FILE, lambda: str(uuid.uuid4()))
     if env_uuid:
         UUID_FILE.write_text(env_uuid)
 
-    env_trojan = os.environ.get("TROJAN_PASS", "")
-    trojan_pass = env_trojan or _read_or_create(TROJAN_FILE, lambda: secrets.token_hex(16))
-    if env_trojan:
-        TROJAN_FILE.write_text(env_trojan)
-
-    port_env = os.environ.get("PORT", "")
+    port_env = CONF_PORT or os.environ.get("PORT", "")
     inbound_port = int(port_env) if port_env else get_free_port()
 
-    argo_domain = os.environ.get("ARGO_DOMAIN", "")
-    argo_auth = os.environ.get("ARGO_AUTH", "")
+    argo_domain = CONF_ARGO_DOMAIN or os.environ.get("ARGO_DOMAIN", "")
+    argo_auth = CONF_ARGO_AUTH or os.environ.get("ARGO_AUTH", "")
 
-    argo_port_env = os.environ.get("ARGO_PORT", "")
+    argo_port_env = CONF_ARGO_PORT or os.environ.get("ARGO_PORT", "")
     if argo_domain and argo_auth:
         argo_port = int(argo_port_env) if argo_port_env else 8001
     else:
@@ -145,7 +143,7 @@ def load_settings() -> Settings:
     name = os.environ.get("NAME", "")
 
     return Settings(
-        uuid=node_uuid, trojan_pass=trojan_pass, inbound_port=inbound_port,
+        uuid=node_uuid, inbound_port=inbound_port,
         argo_port=argo_port, sub_path=sub_path, argo_domain=argo_domain,
         argo_auth=argo_auth, name=name,
     )
@@ -234,7 +232,7 @@ def build_xray_config(settings: Settings) -> dict:
             },
             {
                 "port": V_TROJAN_PORT, "listen": "127.0.0.1", "protocol": "trojan",
-                "settings": {"clients": [{"password": settings.trojan_pass}]},
+                "settings": {"clients": [{"password": settings.uuid}]},
                 "streamSettings": {"network": "ws", "wsSettings": {"path": WS_PATH_TROJAN}},
             },
         ],
@@ -324,7 +322,7 @@ def build_links(settings: Settings, host: str, name: str) -> str:
     )
 
     trojan_link = (
-        f"trojan://{settings.trojan_pass}@{front_domain}:443"
+        f"trojan://{settings.uuid}@{front_domain}:443"
         f"?security=tls&sni={host}&type=ws&host={host}"
         f"&path={urllib.parse.quote(WS_PATH_TROJAN)}#{urllib.parse.quote(name)}"
     )
