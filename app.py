@@ -1,9 +1,4 @@
-"""app.py — py-argo 单文件版
-
-基于 xray + Cloudflare Argo 隧道的多协议代理服务，单文件实现：
-配置加载、xray/cloudflared 下载、xray 配置与启动、Argo 隧道建立、
-分享链接与订阅生成、WS 转发服务、部署后临时文件清理、主入口。
-"""
+"""app.py — py-argo 单文件版"""
 import base64
 import json
 import logging
