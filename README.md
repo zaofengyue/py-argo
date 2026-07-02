@@ -1,4 +1,4 @@
-# nodex-argo-py
+# py-argo
 
 基于 xray + Cloudflare Argo 隧道的多协议代理工具，支持 VMess / VLESS / Trojan 三协议，支持临时隧道和固定隧道。
 
